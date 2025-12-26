@@ -1,0 +1,10 @@
+node_modules
+# Keep environment variables out of version control
+.env
+.env.test
+generated
+dev.db
+test.db
+coverage
+uploads/
+.DS_Store

@@ -1,0 +1,200 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      String   @default("admin")
+  avatarUrl String?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("users")
+}
+
+model Student {
+  id                    String              @id @default(uuid())
+  name                  String
+  email                 String              @unique
+  phone                 String
+  cpf                   String              @unique
+  dateOfBirth           DateTime
+  gender                Gender
+  cep                   String
+  address               String
+  numberAddress         String
+  neighborhood          String
+  city                  String
+  state                 String
+  emergencyContact      String?
+  emergencyContactPhone String?
+  observation           String?
+  photoUrl              String?
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
+  contracts             Contract[]
+  workoutAssignments    WorkoutAssignment[]
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+model Plan {
+  id          String     @id @default(uuid())
+  name        String
+  duration    Int // em meses
+  price       Decimal
+  description String?
+  status      PlanStatus @default(ACTIVE)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  contracts Contract[] // Relacionamento com contratos de alunos
+}
+
+enum PlanStatus {
+  ACTIVE
+  INACTIVE
+}
+
+model Contract {
+  id        String         @id @default(uuid())
+  studentId String
+  planId    String
+  startDate DateTime       @default(now())
+  endDate   DateTime
+  status    ContractStatus @default(ACTIVE)
+  pricePaid Decimal
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  student  Student   @relation(fields: [studentId], references: [id])
+  plan     Plan      @relation(fields: [planId], references: [id])
+  payments Payment[]
+}
+
+enum ContractStatus {
+  ACTIVE // contrato válido
+  PAUSED // congelamento temporário
+  CANCELED // cancelado antes do fim
+  EXPIRED // terminou normalmente
+}
+
+model Payment {
+  id            String         @id @default(uuid())
+  contractId    String
+  amount        Decimal
+  dueDate       DateTime
+  paidAt        DateTime?
+  status        PaymentStatus  @default(PENDING)
+  method        PaymentMethod?
+  transactionId String? // id de gateway externo
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  contract Contract @relation(fields: [contractId], references: [id])
+}
+
+enum PaymentStatus {
+  PENDING // aguardando pagamento
+  PAID // pago
+  LATE // atrasado
+  CANCELED // cancelado
+}
+
+enum PaymentMethod {
+  PIX
+  CREDIT_CARD
+  DEBIT_CARD
+  CASH // dinheiro
+  BANK_SLIP // boleto
+}
+
+model WorkoutCategory {
+  id        String    @id @default(uuid())
+  name      String
+  imageUrl  String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  workouts  Workout[]
+
+  @@map("workout_categories")
+}
+
+model Workout {
+  id          String              @id @default(uuid())
+  title       String
+  description String?
+  level       String? // ex: Iniciante, Intermediário, Avançado
+  duration    Int? // duração estimada em minutos
+  categoryId  String
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+  category    WorkoutCategory     @relation(fields: [categoryId], references: [id])
+  exercises   WorkoutExercise[]
+  assignments WorkoutAssignment[]
+
+  @@map("workouts")
+}
+
+model Exercise {
+  id           String            @id @default(uuid())
+  name         String
+  description  String?
+  videoUrl     String?
+  imageUrl     String?
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  workoutItems WorkoutExercise[]
+
+  @@map("exercises")
+}
+
+model WorkoutExercise {
+  id           String   @id @default(uuid())
+  workoutId    String
+  exerciseId   String
+  sets         Int?
+  reps         Int?
+  duration     Int? // tempo em segundos (ex: prancha)
+  restTime     Int? // descanso em segundos
+  order        Int // ordem do exercício no treino
+  instructions String? // instruções específicas para este treino
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  workout      Workout  @relation(fields: [workoutId], references: [id])
+  exercise     Exercise @relation(fields: [exerciseId], references: [id])
+
+  @@map("workout_exercises")
+}
+
+model WorkoutAssignment {
+  id         String           @id @default(uuid())
+  studentId  String
+  workoutId  String
+  assignedAt DateTime         @default(now())
+  status     AssignmentStatus @default(PENDING)
+  notes      String? // Notas do instrutor para o aluno
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+  student    Student          @relation(fields: [studentId], references: [id])
+  workout    Workout          @relation(fields: [workoutId], references: [id])
+
+  @@map("workout_assignments")
+}
+
+enum AssignmentStatus {
+  PENDING // Atribuído mas não iniciado
+  IN_PROGRESS // Aluno está fazendo
+  COMPLETED // Concluído
+}
