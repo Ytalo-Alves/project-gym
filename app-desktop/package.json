@@ -1,0 +1,53 @@
+{
+  "name": "projeto-acaddemia-electron",
+  "version": "1.0.0",
+  "description": "Aplicação Electron independente com a mesma interface do projeto web",
+  "main": "main.js",
+  "private": true,
+  "scripts": {
+    "dev:web": "next dev --webpack",
+    "build:web": "next build --webpack",
+    "start:web": "next start",
+    "electron": "electron .",
+    "dev": "concurrently \"npm run dev:web\" \"wait-on http://localhost:3000 && npm run electron\""
+  },
+  "dependencies": {
+    "@radix-ui/react-avatar": "^1.1.10",
+    "@radix-ui/react-dialog": "^1.1.15",
+    "@radix-ui/react-dropdown-menu": "^2.1.16",
+    "@radix-ui/react-select": "^2.2.6",
+    "@radix-ui/react-slider": "^1.3.6",
+    "@radix-ui/react-slot": "^1.2.3",
+    "add": "^2.0.6",
+    "avatar": "^0.1.0",
+    "button": "^1.1.1",
+    "canvas-confetti": "^1.9.4",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "dropdown-menu": "^0.1.1",
+    "electron": "^31.0.0",
+    "init": "^0.1.2",
+    "jspdf": "^3.0.4",
+    "jspdf-autotable": "^5.0.2",
+    "lucide-react": "^0.548.0",
+    "next": "16.0.0",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "react-easy-crop": "^5.5.5",
+    "recharts": "^3.4.1",
+    "shadcn-ui": "^0.9.5",
+    "tailwind-merge": "^3.3.1",
+    "wait-on": "^7.2.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/canvas-confetti": "^1.9.0",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "concurrently": "^9.1.0",
+    "tailwindcss": "^4",
+    "tw-animate-css": "^1.4.0",
+    "typescript": "^5"
+  }
+}
